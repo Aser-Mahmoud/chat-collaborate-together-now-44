@@ -127,7 +127,7 @@ const Blog = () => {
             <span className="font-mono">cd ../</span>
           </Link>
           <div className="mb-4">
-            <span className="text-red-400 font-mono text-sm">[EXPLOIT_DATABASE]</span>
+            <span className="text-green-500 font-mono text-sm bg-green-900/30 px-3 py-1 rounded border border-green-700">EXPLOIT_DATABASE</span>
           </div>
           <h1 className="text-5xl font-bold text-green-400 mb-4">Security Writeups</h1>
           <p className="text-green-300/80 text-xl leading-relaxed">
@@ -158,7 +158,7 @@ const Blog = () => {
                   : "border-green-800 text-green-400 hover:border-green-600 hover:bg-green-800/20"
               }`}
             >
-              [ALL_EXPLOITS]
+              ALL_EXPLOITS
             </button>
             {allTags.map((tag) => (
               <button
@@ -228,11 +228,14 @@ const Blog = () => {
                     </span>
                     <span className="font-mono">{writeup.readTime}</span>
                   </div>
-                  <button className="bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-black px-6 py-3 rounded-lg font-bold transition-all duration-300 inline-flex items-center space-x-2 group-hover:scale-105 shadow-lg shadow-green-900/50">
+                  <Link 
+                    to={`/writeup/${writeup.id}`}
+                    className="bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-black px-6 py-3 rounded-lg font-bold transition-all duration-300 inline-flex items-center space-x-2 group-hover:scale-105 shadow-lg shadow-green-900/50"
+                  >
                     <Zap className="h-4 w-4" />
                     <span>Exploit Details</span>
                     <ExternalLink className="h-4 w-4" />
-                  </button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

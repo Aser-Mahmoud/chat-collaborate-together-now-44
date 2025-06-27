@@ -41,6 +41,7 @@ const Index = () => {
 
   const writeups = [
     {
+      id: 1,
       title: "SQL Injection → RCE: Fortune 500 Takedown",
       description: "How a simple SQLi led to complete server compromise",
       difficulty: "Critical",
@@ -49,6 +50,7 @@ const Index = () => {
       tags: ["SQLi", "RCE", "Privilege Escalation"]
     },
     {
+      id: 2,
       title: "CSRF to Account Takeover via XSS Chain",
       description: "Chaining CSRF + Stored XSS for complete account compromise",
       difficulty: "High",
@@ -57,6 +59,7 @@ const Index = () => {
       tags: ["CSRF", "XSS", "Account Takeover"]
     },
     {
+      id: 3,
       title: "Race Condition in Payment System",
       description: "Exploiting race conditions to bypass payment validation",
       difficulty: "Critical",
@@ -65,6 +68,7 @@ const Index = () => {
       tags: ["Race Condition", "Business Logic", "Payment Bypass"]
     },
     {
+      id: 4,
       title: "SSRF to Internal Network Pwning",
       description: "From SSRF to full internal infrastructure compromise",
       difficulty: "Critical",
@@ -106,7 +110,7 @@ const Index = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <div className="mb-4">
-              <span className="text-red-400 font-mono text-sm">[SECURITY_RESEARCHER]</span>
+              <span className="text-green-500 font-mono text-sm bg-green-900/30 px-3 py-1 rounded border border-green-700">SECURITY_RESEARCHER</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-green-400 leading-tight">
               Web Pwn3r
@@ -172,7 +176,7 @@ const Index = () => {
       {/* Highlights */}
       <section className="container mx-auto px-6 py-20">
         <h2 className="text-4xl font-bold mb-12 text-center text-green-400">
-          <span className="text-red-400">[</span>Exploitation Focus<span className="text-red-400">]</span>
+          <span className="text-green-500">»</span> Exploitation Focus <span className="text-green-500">«</span>
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
           {highlights.map((item, index) => (
@@ -200,7 +204,7 @@ const Index = () => {
       <section className="container mx-auto px-6 py-20 border-t border-green-800">
         <div className="flex items-center justify-between mb-12">
           <h2 className="text-4xl font-bold text-green-400">
-            <span className="text-red-400">[</span>Latest Exploits<span className="text-red-400">]</span>
+            <span className="text-green-500">»</span> Latest Exploits <span className="text-green-500">«</span>
           </h2>
           <Link 
             to="/blog" 
@@ -248,10 +252,13 @@ const Index = () => {
                   <span className="text-sm text-green-500 font-mono">
                     Platform: {writeup.platform}
                   </span>
-                  <button className="bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-black px-4 py-2 rounded font-bold text-sm transition-all duration-300 inline-flex items-center space-x-2 group-hover:scale-105">
+                  <Link 
+                    to={`/writeup/${writeup.id}`}
+                    className="bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-black px-4 py-2 rounded font-bold text-sm transition-all duration-300 inline-flex items-center space-x-2 group-hover:scale-105"
+                  >
                     <span>Read Exploit</span>
                     <ExternalLink className="h-4 w-4" />
-                  </button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
@@ -268,7 +275,7 @@ const Index = () => {
               echo "Stay curious, stay ethical, stay 1337!"
             </div>
             <div className="text-green-600 text-sm font-mono">
-              [Responsible Disclosure Only] | [Educational Purposes] | [Hack The Planet]
+              <span className="text-green-500">»</span> Responsible Disclosure Only <span className="text-green-500">«</span> | <span className="text-green-500">»</span> Educational Purposes <span className="text-green-500">«</span> | <span className="text-green-500">»</span> Hack The Planet <span className="text-green-500">«</span>
             </div>
           </div>
         </div>
