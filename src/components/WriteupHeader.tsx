@@ -1,5 +1,5 @@
 
-import { Calendar, Clock, Eye, Target, Flag, Zap } from "lucide-react";
+import { Calendar, Clock, Eye, Target, Flag, Zap, Shield, Terminal } from "lucide-react";
 
 interface WriteupHeaderProps {
   title: string;
@@ -23,88 +23,106 @@ const WriteupHeader = ({
   summary
 }: WriteupHeaderProps) => {
   return (
-    <div className="mb-12">
-      {/* Clean Cover Image */}
-      <div className="relative mb-8 rounded-xl overflow-hidden border border-green-800 shadow-2xl shadow-green-900/50">
-        <div className="relative h-48 md:h-64 w-full">
-          <img 
-            src={coverImage} 
-            alt={title}
-            className="w-full h-full object-cover filter brightness-75"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=600&fit=crop";
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"></div>
+    <div className="mb-16">
+      {/* Enhanced Cover Image with cyberpunk effects */}
+      <div className="relative mb-10 rounded-2xl overflow-hidden border border-cyan-500/50 shadow-2xl shadow-cyan-500/20">
+        <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 rounded-2xl blur opacity-20"></div>
+        <div className="relative bg-black rounded-2xl overflow-hidden">
+          <div className="relative h-56 md:h-72 w-full">
+            <img 
+              src={coverImage} 
+              alt={title}
+              className="w-full h-full object-cover filter brightness-60 contrast-125"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=600&fit=crop";
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-purple-500/10"></div>
+          </div>
         </div>
       </div>
 
-      {/* Title and Difficulty Outside Image */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-4 mb-4">
-          <span className={`text-xs px-4 py-2 rounded-full font-mono font-bold border animate-pulse ${
+      {/* Title and Difficulty with enhanced styling */}
+      <div className="mb-10">
+        <div className="flex flex-wrap items-center gap-4 mb-6">
+          <span className={`text-sm px-6 py-3 rounded-full font-mono font-bold border-2 relative overflow-hidden group ${
             difficulty === 'Critical' 
-              ? 'bg-red-900/80 text-red-200 border-red-700' 
+              ? 'bg-gradient-to-r from-red-900/80 to-pink-900/80 text-red-200 border-red-500/70 shadow-lg shadow-red-500/30' 
               : difficulty === 'High'
-              ? 'bg-orange-900/80 text-orange-200 border-orange-700'
-              : 'bg-yellow-900/80 text-yellow-200 border-yellow-700'
+              ? 'bg-gradient-to-r from-orange-900/80 to-red-900/80 text-orange-200 border-orange-500/70 shadow-lg shadow-orange-500/30'
+              : 'bg-gradient-to-r from-yellow-900/80 to-orange-900/80 text-yellow-200 border-yellow-500/70 shadow-lg shadow-yellow-500/30'
           }`}>
-            [SEVERITY: {difficulty.toUpperCase()}]
+            <span className="relative z-10">[SEVERITY: {difficulty.toUpperCase()}]</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </span>
-          <div className="flex items-center space-x-2 text-green-400 bg-gray-900/60 px-3 py-1 rounded border border-green-800">
-            <Flag className="h-4 w-4" />
-            <span className="font-mono text-sm">{platform}</span>
+          <div className="flex items-center space-x-3 text-cyan-400 bg-gradient-to-r from-cyan-900/60 to-blue-900/60 px-5 py-3 rounded-full border border-cyan-500/50 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/30 transition-all duration-300 group">
+            <Flag className="h-5 w-5 group-hover:scale-110 transition-transform duration-200" />
+            <span className="font-mono text-sm font-semibold">{platform}</span>
           </div>
         </div>
         
-        <h1 className="text-4xl md:text-6xl font-bold text-green-300 mb-4 font-mono tracking-wider">
-          <span className="text-red-400">&gt; </span>
-          {title}
-          <span className="text-green-400 animate-pulse">_</span>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 font-mono tracking-wider relative">
+          <span className="text-red-400 mr-2">&gt; </span>
+          <span className="text-transparent bg-gradient-to-r from-cyan-200 via-purple-200 to-pink-200 bg-clip-text">
+            {title}
+          </span>
+          <span className="text-cyan-400 animate-pulse ml-2">_</span>
         </h1>
       </div>
 
-      {/* Meta Information Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gray-900/80 border border-green-800 rounded-lg px-4 py-3 text-center backdrop-blur-sm hover:border-green-600 transition-all">
-          <Calendar className="h-6 w-6 text-green-400 mx-auto mb-2" />
-          <div className="text-green-300 font-mono text-sm">{date}</div>
+      {/* Enhanced Meta Information Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-slate-800/80 border border-emerald-500/40 rounded-xl px-6 py-5 text-center backdrop-blur-sm hover:border-emerald-400/60 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/20 group">
+          <Calendar className="h-7 w-7 text-emerald-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-200" />
+          <div className="text-emerald-200 font-mono text-sm font-semibold">{date}</div>
         </div>
-        <div className="bg-gray-900/80 border border-green-800 rounded-lg px-4 py-3 text-center backdrop-blur-sm hover:border-green-600 transition-all">
-          <Clock className="h-6 w-6 text-green-400 mx-auto mb-2" />
-          <div className="text-green-300 font-mono text-sm">{readTime}</div>
+        <div className="bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-slate-800/80 border border-blue-500/40 rounded-xl px-6 py-5 text-center backdrop-blur-sm hover:border-blue-400/60 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 group">
+          <Clock className="h-7 w-7 text-blue-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-200" />
+          <div className="text-blue-200 font-mono text-sm font-semibold">{readTime}</div>
         </div>
-        <div className="bg-gray-900/80 border border-green-800 rounded-lg px-4 py-3 text-center backdrop-blur-sm hover:border-green-600 transition-all">
-          <Eye className="h-6 w-6 text-green-400 mx-auto mb-2" />
-          <div className="text-green-300 font-mono text-sm">{platform}</div>
+        <div className="bg-gradient-to-br from-slate-900/80 via-gray-900/80 to-slate-800/80 border border-purple-500/40 rounded-xl px-6 py-5 text-center backdrop-blur-sm hover:border-purple-400/60 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20 group">
+          <Eye className="h-7 w-7 text-purple-400 mx-auto mb-3 group-hover:scale-110 transition-transform duration-200" />
+          <div className="text-purple-200 font-mono text-sm font-semibold">{platform}</div>
         </div>
       </div>
 
-      {/* Tags */}
-      <div className="flex flex-wrap gap-3 mb-8">
+      {/* Enhanced Tags */}
+      <div className="flex flex-wrap gap-4 mb-12">
         {tags.map((tag, index) => (
           <span
             key={index}
-            className="inline-flex items-center text-sm bg-gray-900/80 text-green-200 px-4 py-2 rounded-full font-mono border border-green-800 backdrop-blur-sm hover:border-green-600 hover:bg-green-900/30 transition-all duration-300 cursor-pointer"
+            className="inline-flex items-center text-sm bg-gradient-to-r from-gray-900/80 via-slate-900/80 to-gray-800/80 text-cyan-200 px-5 py-3 rounded-full font-mono border border-cyan-500/40 backdrop-blur-sm hover:border-cyan-400/70 hover:bg-gradient-to-r hover:from-cyan-900/40 hover:via-blue-900/40 hover:to-purple-900/40 transition-all duration-300 cursor-pointer group shadow-lg hover:shadow-cyan-500/20"
           >
-            <Target className="h-3 w-3 mr-2" />
-            #{tag.replace(/\s+/g, '_').toLowerCase()}
+            <Target className="h-4 w-4 mr-3 group-hover:scale-110 transition-transform duration-200" />
+            <span className="group-hover:text-cyan-100 transition-colors duration-200">
+              #{tag.replace(/\s+/g, '_').toLowerCase()}
+            </span>
           </span>
         ))}
       </div>
 
-      {/* Executive Summary */}
-      <div className="bg-gray-900/40 border border-green-800 rounded-lg p-8 backdrop-blur-sm shadow-2xl shadow-green-900/50">
-        <div className="flex items-center space-x-3 mb-4">
-          <Zap className="h-6 w-6 text-green-400 animate-pulse" />
-          <h3 className="text-2xl font-bold text-green-300 font-mono">[EXEC_SUMMARY]</h3>
-        </div>
-        <div className="bg-black/40 border border-green-700 rounded p-4 font-mono">
-          <div className="text-green-400 text-xs mb-2">root@security:~$ cat executive_summary.txt</div>
-          <p className="text-green-300/90 leading-relaxed text-lg">
-            {summary}
-          </p>
+      {/* Enhanced Executive Summary */}
+      <div className="relative">
+        <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600 rounded-2xl blur opacity-20"></div>
+        <div className="relative bg-gradient-to-br from-gray-900/60 via-black/60 to-slate-900/60 border border-purple-500/40 rounded-2xl p-10 backdrop-blur-sm shadow-2xl">
+          <div className="flex items-center space-x-4 mb-6">
+            <Zap className="h-8 w-8 text-purple-400 animate-pulse drop-shadow-lg" />
+            <h3 className="text-3xl font-bold text-transparent bg-gradient-to-r from-purple-200 via-pink-200 to-cyan-200 bg-clip-text font-mono">
+              [EXEC_SUMMARY]
+            </h3>
+          </div>
+          <div className="bg-black/60 border border-purple-500/30 rounded-xl p-6 font-mono relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-cyan-500/5"></div>
+            <div className="relative flex items-center space-x-3 mb-4">
+              <Terminal className="h-5 w-5 text-purple-400" />
+              <div className="text-purple-300 text-sm font-bold">root@security:~$ cat executive_summary.txt</div>
+            </div>
+            <p className="text-slate-200 leading-relaxed text-lg relative z-10">
+              {summary}
+            </p>
+          </div>
         </div>
       </div>
     </div>
