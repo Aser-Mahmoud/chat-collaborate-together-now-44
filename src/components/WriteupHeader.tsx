@@ -24,31 +24,42 @@ const WriteupHeader = ({
 }: WriteupHeaderProps) => {
   return (
     <div className="mb-12">
-      {/* Cover Image */}
+      {/* Cover Image Header */}
       <div className="relative mb-8 rounded-xl overflow-hidden border border-green-800 shadow-2xl shadow-green-900/50">
-        <img 
-          src={coverImage} 
-          alt={title}
-          className="w-full h-64 md:h-80 object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
-        <div className="absolute bottom-6 left-6 right-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <span className={`text-xs px-3 py-1 rounded-full font-mono font-bold border ${
-              difficulty === 'Critical' 
-                ? 'bg-red-900/80 text-red-200 border-red-700' 
-                : 'bg-orange-900/80 text-orange-200 border-orange-700'
-            }`}>
-              {difficulty.toUpperCase()}
-            </span>
-            <div className="flex items-center space-x-2 text-green-400">
-              <Flag className="h-4 w-4" />
-              <span className="font-mono text-sm">{platform}</span>
+        <div className="relative h-64 md:h-80 w-full">
+          <img 
+            src={coverImage} 
+            alt={title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to a default tech image if the original fails
+              const target = e.target as HTMLImageElement;
+              target.src = "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=600&fit=crop";
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+          
+          {/* Header Content Over Image */}
+          <div className="absolute bottom-0 left-0 right-0 p-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <span className={`text-xs px-3 py-1 rounded-full font-mono font-bold border ${
+                difficulty === 'Critical' 
+                  ? 'bg-red-900/80 text-red-200 border-red-700' 
+                  : difficulty === 'High'
+                  ? 'bg-orange-900/80 text-orange-200 border-orange-700'
+                  : 'bg-yellow-900/80 text-yellow-200 border-yellow-700'
+              }`}>
+                {difficulty.toUpperCase()}
+              </span>
+              <div className="flex items-center space-x-2 text-green-400">
+                <Flag className="h-4 w-4" />
+                <span className="font-mono text-sm">{platform}</span>
+              </div>
             </div>
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg leading-tight">
+              {title}
+            </h1>
           </div>
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
-            {title}
-          </h1>
         </div>
       </div>
 
