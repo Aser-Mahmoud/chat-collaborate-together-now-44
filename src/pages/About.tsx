@@ -102,7 +102,7 @@ const About = () => {
             <div className="mb-6">
               <span className="text-red-400 font-mono text-sm animate-pulse">[USER_PROFILE_INIT] ...</span>
               <div className="mt-2 flex items-center space-x-2">
-                <span className="text-green-400 text-sm">></span>
+                <span className="text-green-400 text-sm">&gt;</span>
                 <span className="text-green-300 text-sm font-mono">Loading profile data...</span>
                 <div className="flex space-x-1">
                   <div className="w-1 h-1 bg-green-400 rounded-full animate-bounce"></div>
