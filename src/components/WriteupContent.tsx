@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Copy, Check, Terminal, Lock, Bug } from "lucide-react";
 
@@ -93,7 +92,7 @@ const WriteupContent = ({ content, title }: WriteupContentProps) => {
         }
       }
 
-      // Simple Headers with consistent styling
+      // Headers with consistent styling
       if (trimmedSection.startsWith('#')) {
         const headerMatch = trimmedSection.match(/^(#{1,6})\s+(.+)$/);
         if (headerMatch) {
@@ -128,14 +127,14 @@ const WriteupContent = ({ content, title }: WriteupContentProps) => {
         }
       }
 
-      // Enhanced Lists
+      // Enhanced Lists - unordered
       if (trimmedSection.includes('\n- ') || trimmedSection.startsWith('- ')) {
         const items = trimmedSection.split('\n').filter(line => line.trim().startsWith('- '));
         return (
-          <ul key={index} className="my-6 space-y-2 pl-6">
+          <ul key={index} className="my-6 space-y-2 pl-6 list-disc list-inside">
             {items.map((item, itemIndex) => (
-              <li key={itemIndex} className="text-slate-200 leading-relaxed list-disc">
-                {item.replace(/^-\s*/, '')}
+              <li key={itemIndex} className="text-slate-200 leading-relaxed">
+                {processInlineCode(item.replace(/^-\s*/, ''))}
               </li>
             ))}
           </ul>
@@ -146,15 +145,43 @@ const WriteupContent = ({ content, title }: WriteupContentProps) => {
       if (trimmedSection.match(/^\d+\.\s/)) {
         const items = trimmedSection.split('\n').filter(line => line.trim().match(/^\d+\.\s/));
         return (
-          <ol key={index} className="my-6 space-y-2 pl-6 list-decimal">
+          <ol key={index} className="my-6 space-y-2 pl-6 list-decimal list-inside">
             {items.map((item, itemIndex) => (
               <li key={itemIndex} className="text-slate-200 leading-relaxed">
-                {item.replace(/^\d+\.\s*/, '')}
+                {processInlineCode(item.replace(/^\d+\.\s*/, ''))}
               </li>
             ))}
           </ol>
         );
       }
+
+      // Bold text **text**
+      const processBold = (text: string) => {
+        return text.split(/(\*\*[^*]+\*\*)/).map((part, i) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return (
+              <strong key={i} className="font-bold text-cyan-300">
+                {part.slice(2, -2)}
+              </strong>
+            );
+          }
+          return part;
+        });
+      };
+
+      // Italic text *text*
+      const processItalic = (text: string) => {
+        return text.split(/(\*[^*]+\*)/).map((part, i) => {
+          if (part.startsWith('*') && part.endsWith('*') && !part.startsWith('**')) {
+            return (
+              <em key={i} className="italic text-purple-300">
+                {part.slice(1, -1)}
+              </em>
+            );
+          }
+          return part;
+        });
+      };
 
       // Enhanced inline code processing
       const processInlineCode = (text: string) => {
@@ -166,9 +193,28 @@ const WriteupContent = ({ content, title }: WriteupContentProps) => {
               </code>
             );
           }
-          return part;
+          // Process bold and italic for non-code parts
+          const withBold = processBold(part);
+          return withBold.map((boldPart, j) => {
+            if (typeof boldPart === 'string') {
+              return processItalic(boldPart);
+            }
+            return boldPart;
+          });
         });
       };
+
+      // Blockquotes
+      if (trimmedSection.startsWith('>')) {
+        const quote = trimmedSection.replace(/^>\s*/, '');
+        return (
+          <blockquote key={index} className="border-l-4 border-cyan-500 pl-6 py-4 my-6 bg-gray-900/50 rounded-r-lg">
+            <p className="text-slate-300 italic leading-relaxed">
+              {processInlineCode(quote)}
+            </p>
+          </blockquote>
+        );
+      }
 
       // Standard paragraphs with consistent styling
       return (

@@ -1,4 +1,3 @@
-
 import { Terminal, Shield, Bug, Globe, ChevronRight, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -46,7 +45,6 @@ const Index = () => {
       description: "How a simple SQLi led to complete server compromise",
       difficulty: "Critical",
       platform: "Private Program",
-      bounty: "$15,000",
       tags: ["SQLi", "RCE", "Privilege Escalation"]
     },
     {
@@ -55,7 +53,6 @@ const Index = () => {
       description: "Chaining CSRF + Stored XSS for complete account compromise",
       difficulty: "High",
       platform: "HackerOne",
-      bounty: "$8,500",
       tags: ["CSRF", "XSS", "Account Takeover"]
     },
     {
@@ -64,7 +61,6 @@ const Index = () => {
       description: "Exploiting race conditions to bypass payment validation",
       difficulty: "Critical",
       platform: "Bugcrowd",
-      bounty: "$12,000",
       tags: ["Race Condition", "Business Logic", "Payment Bypass"]
     },
     {
@@ -73,7 +69,6 @@ const Index = () => {
       description: "From SSRF to full internal infrastructure compromise",
       difficulty: "Critical",
       platform: "Private Program",
-      bounty: "$20,000",
       tags: ["SSRF", "Network Pivoting", "Internal Recon"]
     }
   ];
@@ -226,7 +221,6 @@ const Index = () => {
                   }`}>
                     {writeup.difficulty.toUpperCase()}
                   </span>
-                  <span className="text-green-400 font-mono text-sm">{writeup.bounty}</span>
                 </div>
                 
                 <h3 className="text-xl font-bold text-green-300 mb-3 group-hover:text-green-200 transition-colors">

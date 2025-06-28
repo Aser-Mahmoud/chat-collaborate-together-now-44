@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Terminal, Search, Tag, Calendar, ArrowLeft, ExternalLink, Zap } from "lucide-react";
@@ -18,7 +17,6 @@ const Blog = () => {
       tags: ["SQL Injection", "RCE", "Second-Order", "Privilege Escalation"],
       readTime: "15 min read",
       difficulty: "Critical",
-      bounty: "$15,000",
       platform: "Private Program"
     },
     {
@@ -30,7 +28,6 @@ const Blog = () => {
       tags: ["CSRF", "XSS", "Account Takeover", "DOM Manipulation"],
       readTime: "12 min read",
       difficulty: "High",
-      bounty: "$8,500",
       platform: "HackerOne"
     },
     {
@@ -42,7 +39,6 @@ const Blog = () => {
       tags: ["Race Condition", "Business Logic", "Payment Bypass", "Concurrency"],
       readTime: "18 min read",
       difficulty: "Critical",
-      bounty: "$12,000",
       platform: "Bugcrowd"
     },
     {
@@ -54,7 +50,6 @@ const Blog = () => {
       tags: ["SSRF", "Network Pivoting", "Internal Recon", "AWS Metadata"],
       readTime: "22 min read",
       difficulty: "Critical",
-      bounty: "$20,000",
       platform: "Private Program"
     },
     {
@@ -66,7 +61,6 @@ const Blog = () => {
       tags: ["JWT", "Authentication Bypass", "Algorithm Confusion", "Cryptographic Attacks"],
       readTime: "14 min read",
       difficulty: "High",
-      bounty: "$7,500",
       platform: "Intigriti"
     },
     {
@@ -78,7 +72,6 @@ const Blog = () => {
       tags: ["DOM XSS", "React", "Client-Side", "JavaScript Security"],
       readTime: "16 min read",
       difficulty: "Medium",
-      bounty: "$4,200",
       platform: "HackerOne"
     }
   ];
@@ -193,10 +186,6 @@ const Blog = () => {
                       {writeup.difficulty.toUpperCase()}
                     </span>
                     <span className="text-green-500 font-mono text-sm">{writeup.platform}</span>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-green-400 font-mono font-bold text-lg">{writeup.bounty}</div>
-                    <div className="text-green-600 text-xs font-mono">BOUNTY_REWARD</div>
                   </div>
                 </div>
 
