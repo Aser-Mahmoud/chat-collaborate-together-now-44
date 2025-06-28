@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Terminal, Shield, Bug, Globe, Award, ArrowLeft, ExternalLink, Target, Zap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -67,13 +66,6 @@ const About = () => {
     }
   ];
 
-  const stats = [
-    { label: "Critical Bugs Found", value: "50+", color: "text-red-400" },
-    { label: "Total Bounty Earned", value: "$150K+", color: "text-green-400" },
-    { label: "Platforms Pwned", value: "25+", color: "text-blue-400" },
-    { label: "Years Experience", value: "3+", color: "text-purple-400" }
-  ];
-
   return (
     <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
       {/* Background effect */}
@@ -117,24 +109,6 @@ const About = () => {
             passionate about breaking things and making the web safer.
           </p>
         </div>
-
-        {/* Stats */}
-        <section className="mb-16">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <Card key={index} className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
-                <CardContent className="p-6 text-center">
-                  <div className={`text-3xl font-bold ${stat.color} mb-2`}>
-                    {stat.value}
-                  </div>
-                  <div className="text-green-400/80 text-sm font-mono">
-                    {stat.label}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
 
         {/* Terminal Bio */}
         <div className="mb-16">

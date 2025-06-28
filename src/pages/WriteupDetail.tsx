@@ -111,6 +111,26 @@ www-data@target:~$ ip route
           }
         ]
       }
+    },
+    "3": {
+      title: "Business Logic Bypass → $50K Bounty",
+      date: "2024-01-05",
+      readTime: "10 min read",
+      difficulty: "High",
+      bounty: "$50,000",
+      platform: "Private Program",
+      tags: ["Business Logic", "Race Condition", "Payment Bypass"],
+      coverImage: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&h=600&fit=crop",
+      content: {
+        summary: "Exploiting race conditions in payment processing to bypass business logic and achieve unauthorized transactions.",
+        sections: [
+          {
+            title: "Vulnerability Analysis",
+            content: "Found critical race condition in payment processing workflow that allowed bypassing payment verification through timing attacks.",
+            image: "https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=800&h=400&fit=crop"
+          }
+        ]
+      }
     }
   };
 
@@ -118,7 +138,7 @@ www-data@target:~$ ip route
 
   if (!writeup) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-green-400 font-mono flex items-center justify-center">
+      <div className="min-h-screen bg-black text-green-400 font-mono flex items-center justify-center">
         <div className="text-center">
           <div className="text-8xl font-bold text-red-500 mb-4 animate-pulse">404</div>
           <h1 className="text-3xl font-bold text-red-400 mb-4">EXPLOIT_NOT_FOUND</h1>
@@ -139,34 +159,27 @@ www-data@target:~$ ip route
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-green-400 font-mono relative">
-      {/* Animated background */}
-      <div className="fixed inset-0 opacity-10 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-r from-green-900/20 via-transparent to-green-900/20 animate-pulse"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23065f46' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }}></div>
+    <div className="min-h-screen bg-black text-green-400 font-mono relative overflow-hidden">
+      {/* Background effect - consistent with other pages */}
+      <div className="fixed inset-0 opacity-5 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 via-transparent to-green-900/20"></div>
       </div>
 
       {/* Navigation */}
-      <nav className="border-b border-green-800/50 bg-black/90 backdrop-blur-md sticky top-0 z-50 shadow-2xl shadow-green-900/20">
+      <nav className="border-b border-green-800 bg-black/95 backdrop-blur-sm sticky top-0 z-50 shadow-lg shadow-green-900/20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Terminal className="h-8 w-8 text-green-400 animate-pulse drop-shadow-lg" />
-              <div className="flex items-center space-x-2">
-                <span className="text-3xl font-bold text-green-400 drop-shadow-lg">
-                  v1g0<span className="text-red-400">_</span>blog
-                </span>
-                <span className="text-xs text-green-600 font-mono bg-green-900/30 px-2 py-1 rounded border border-green-700">
-                  root@security
-                </span>
-              </div>
+            <div className="flex items-center space-x-3">
+              <Terminal className="h-7 w-7 text-green-400 animate-pulse" />
+              <span className="text-2xl font-bold text-green-400">
+                v1g0<span className="text-red-400">_</span>blog
+              </span>
+              <span className="text-xs text-green-600 font-mono">[root@security]</span>
             </div>
             <div className="flex items-center space-x-8">
-              <Link to="/" className="hover:text-green-300 transition-all duration-300 hover:scale-105">~/home</Link>
-              <Link to="/blog" className="hover:text-green-300 transition-all duration-300 hover:scale-105">~/writeups</Link>
-              <Link to="/about" className="hover:text-green-300 transition-all duration-300 hover:scale-105">~/whoami</Link>
+              <Link to="/" className="hover:text-green-300 transition-all duration-300">~/home</Link>
+              <Link to="/blog" className="hover:text-green-300 transition-all duration-300">~/writeups</Link>
+              <Link to="/about" className="hover:text-green-300 transition-all duration-300">~/whoami</Link>
             </div>
           </div>
         </div>
@@ -181,7 +194,7 @@ www-data@target:~$ ip route
           </Link>
 
           {/* Cover Image */}
-          <div className="relative mb-8 rounded-xl overflow-hidden border border-green-800/50 shadow-2xl">
+          <div className="relative mb-8 rounded-xl overflow-hidden border border-green-800 shadow-2xl shadow-green-900/50">
             <img 
               src={writeup.coverImage} 
               alt={writeup.title}
@@ -212,25 +225,25 @@ www-data@target:~$ ip route
 
           {/* Meta Information */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <Card className="bg-gray-900/60 border-green-800/50 backdrop-blur-sm">
+            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
               <CardContent className="p-4 text-center">
                 <Calendar className="h-6 w-6 text-green-400 mx-auto mb-2" />
                 <div className="text-green-300 font-mono text-sm">{writeup.date}</div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-900/60 border-green-800/50 backdrop-blur-sm">
+            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
               <CardContent className="p-4 text-center">
                 <Clock className="h-6 w-6 text-green-400 mx-auto mb-2" />
                 <div className="text-green-300 font-mono text-sm">{writeup.readTime}</div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-900/60 border-green-800/50 backdrop-blur-sm">
+            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
               <CardContent className="p-4 text-center">
                 <Award className="h-6 w-6 text-green-400 mx-auto mb-2" />
                 <div className="text-green-300 font-mono text-sm font-bold">{writeup.bounty}</div>
               </CardContent>
             </Card>
-            <Card className="bg-gray-900/60 border-green-800/50 backdrop-blur-sm">
+            <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm">
               <CardContent className="p-4 text-center">
                 <Shield className="h-6 w-6 text-green-400 mx-auto mb-2" />
                 <div className="text-green-300 font-mono text-sm">{writeup.platform}</div>
@@ -243,7 +256,7 @@ www-data@target:~$ ip route
             {writeup.tags.map((tag, index) => (
               <span
                 key={index}
-                className="inline-flex items-center text-sm bg-gradient-to-r from-green-800/50 to-green-700/50 text-green-200 px-4 py-2 rounded-full font-mono border border-green-600/50 backdrop-blur-sm hover:from-green-700/60 hover:to-green-600/60 transition-all duration-300"
+                className="inline-flex items-center text-sm bg-gray-900/80 text-green-200 px-4 py-2 rounded-full font-mono border border-green-800 backdrop-blur-sm hover:border-green-600 transition-all duration-300"
               >
                 <Target className="h-3 w-3 mr-2" />
                 #{tag.replace(/\s+/g, '_').toLowerCase()}
@@ -252,7 +265,7 @@ www-data@target:~$ ip route
           </div>
 
           {/* Executive Summary */}
-          <Card className="bg-gradient-to-r from-gray-900/80 to-gray-800/80 border-green-700/50 backdrop-blur-sm shadow-xl">
+          <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm shadow-2xl shadow-green-900/50">
             <CardContent className="p-8">
               <div className="flex items-center space-x-3 mb-4">
                 <Zap className="h-6 w-6 text-green-400" />
@@ -266,9 +279,9 @@ www-data@target:~$ ip route
         </div>
 
         {/* Content Sections */}
-        <div className="space-y-12">
+        <div className="space-y-8">
           {writeup.content.sections.map((section, index) => (
-            <Card key={index} className="bg-gradient-to-br from-gray-900/80 to-gray-800/60 border-green-800/50 backdrop-blur-sm shadow-2xl hover:shadow-green-900/20 transition-all duration-500">
+            <Card key={index} className="bg-gray-900/80 border-green-800 backdrop-blur-sm shadow-2xl shadow-green-900/50">
               <CardContent className="p-8">
                 <div className="flex items-center space-x-4 mb-6">
                   <div className="bg-gradient-to-r from-green-600 to-green-500 text-black w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
@@ -280,7 +293,7 @@ www-data@target:~$ ip route
                 </div>
                 
                 {section.image && (
-                  <div className="mb-8 rounded-lg overflow-hidden border border-green-700/50 shadow-xl">
+                  <div className="mb-8 rounded-lg overflow-hidden border border-green-800 shadow-xl">
                     <img 
                       src={section.image} 
                       alt={section.title}
@@ -295,8 +308,8 @@ www-data@target:~$ ip route
 
                 {section.code && (
                   <div className="relative group">
-                    <div className="bg-gradient-to-br from-gray-950 to-black border border-green-700/50 rounded-lg overflow-hidden shadow-2xl">
-                      <div className="bg-gradient-to-r from-gray-800 to-gray-700 px-6 py-3 flex items-center justify-between border-b border-green-700/50">
+                    <div className="bg-gray-950 border border-green-800 rounded-lg overflow-hidden shadow-2xl">
+                      <div className="bg-gray-800 px-6 py-3 flex items-center justify-between border-b border-green-800">
                         <div className="flex items-center space-x-3">
                           <div className="flex space-x-2">
                             <div className="w-3 h-3 bg-red-500 rounded-full"></div>
@@ -307,7 +320,7 @@ www-data@target:~$ ip route
                         </div>
                         <button
                           onClick={() => copyToClipboard(section.code!, section.title)}
-                          className="text-green-400 hover:text-green-300 transition-colors flex items-center space-x-2 bg-green-900/30 hover:bg-green-800/40 px-3 py-1 rounded border border-green-700/50"
+                          className="text-green-400 hover:text-green-300 transition-colors flex items-center space-x-2 bg-green-900/30 hover:bg-green-800/40 px-3 py-1 rounded border border-green-700"
                         >
                           {copiedCode === section.title ? (
                             <>
@@ -323,10 +336,9 @@ www-data@target:~$ ip route
                         </button>
                       </div>
                       <div className="relative">
-                        <pre className="p-6 text-green-300 font-mono text-sm overflow-x-auto bg-gradient-to-br from-gray-950 to-black">
+                        <pre className="p-6 text-green-300 font-mono text-sm overflow-x-auto bg-gray-950">
                           <code className="text-green-400">{section.code}</code>
                         </pre>
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                       </div>
                     </div>
                   </div>
@@ -337,8 +349,8 @@ www-data@target:~$ ip route
         </div>
 
         {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-green-800/50">
-          <Card className="bg-gradient-to-r from-gray-900/90 to-gray-800/80 border-green-700/50 backdrop-blur-sm shadow-2xl">
+        <div className="mt-16 pt-8 border-t border-green-800">
+          <Card className="bg-gray-900/80 border-green-800 backdrop-blur-sm shadow-2xl shadow-green-900/50">
             <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
                 <div>
