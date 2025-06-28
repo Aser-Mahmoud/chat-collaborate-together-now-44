@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Terminal, ArrowLeft, Code, Wifi, Shield, Zap } from "lucide-react";
+import { Terminal, ArrowLeft, Code, Shield, Zap } from "lucide-react";
 import TerminalBio from "@/components/about/TerminalBio";
 import TechnicalArsenal from "@/components/about/TechnicalArsenal";
 import ContactSection from "@/components/about/ContactSection";
@@ -29,18 +29,14 @@ const About = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Terminal className="h-8 w-8 text-green-400 animate-pulse" />
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
-              </div>
+              <Terminal className="h-8 w-8 text-green-400" />
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-green-400 tracking-wider">
                   v1g0<span className="text-red-400 animate-pulse">_</span>blog
                 </span>
-                <div className="flex items-center space-x-2 text-xs">
-                  <span className="text-green-600 font-mono">[root@security]</span>
-                  <Wifi className="h-3 w-3 text-green-500 animate-pulse" />
-                  <span className="text-green-500">ONLINE</span>
+                <div className="flex items-center space-x-1 text-xs">
+                  <span className="text-green-600 font-mono opacity-70">root@security</span>
+                  <span className="text-green-500 animate-pulse">_</span>
                 </div>
               </div>
             </div>
